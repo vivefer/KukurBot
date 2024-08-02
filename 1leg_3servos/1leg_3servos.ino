@@ -20,12 +20,16 @@ void setup()
 
 void loop() {
   // put ur main code here, to run repeatedly:
-  int l = 500;
-  int s = 150;
-  int sl = 1000;
-  hip.write(90); // The resting position of the hip servo is 90, 180 is perpendicularly up and 0 is perpendicularly down.
-  upjoin.write(0);
-  lowjoin.write(0);
+  int l = 500; //long duration
+  int s = 150; //short duration
+  int sl = 1000; // super long duration
+  // initial positions
+  int k = 30; // knee
+  int uj = 90; // upper join
+  int h = 90; // hip
+  hip.write(h); // The resting position of the hip servo is 90, 180 is perpendicularly up and 0 is perpendicularly down.
+  upjoin.write(uj);
+  lowjoin.write(k);
   if(Serial.available()>0)
   {
     String command = Serial.readStringUntil('\n');
@@ -131,21 +135,24 @@ void loop() {
   while(currentState == WALKING)
     {
       delay(l);
-      hip.write(100); // 90+10 i.e. 10 degree to side
+      hip.write(h+15); // hip in walking position
       delay(sl);
-      lowjoin.write(25);
-      delay(sl);
-      upjoin.write(45);
-      delay(sl);
-      lowjoin.write(5);
-      delay(sl+l);
-      lowjoin.write(25);
-      delay(sl);
-      upjoin.write(5);
-      delay(sl);
-      hip.write(90);
-      
 
+      //lowjoin.write(k);
+      //delay(sl);
+      upjoin.write(uj+20); // leg moving forward
+      delay(sl);
+      lowjoin.write(k-15); // knee touchihg ground
+      delay(sl+l);
+      upjoin.write(uj-20); // leg pushing back
+      delay(sl);
+      lowjoin.write(k+15); // knee lifting from ground
+      delay(sl);
+      //upjoin.write(uj);
+      //delay(sl);
+      hip.write(h); // hip to resting position
+      //Repeat the process
+      //to stop the walking
       if (Serial.available()>0)
           {
             String command = Serial.readStringUntil('\n');
@@ -167,24 +174,24 @@ void loop() {
             }
           }
     }
-  
+  //Next is to code reverse walking, side walking and reverse side walking after making the forward walking stable
+  //No work shall be done below this code until the walking is completely coded.
   while(currentState == RUNNING)
     {
       delay(l);
-      hip.write(100);
-      delay(sl);
-      lowjoin.write(25);
+      hip.write(h+15); // 90+15 i.e. 15 degree to side
       delay(s);
-      upjoin.write(45);
+      lowjoin.write(k+35);
       delay(s);
-      lowjoin.write(5);
+      upjoin.write(uj+30);
+      delay(s);
+      lowjoin.write(k+5);
       delay(l);
-      lowjoin.write(25);
+      lowjoin.write(k);
       delay(s);
-      upjoin.write(5);
+      upjoin.write(uj);
       delay(s);
-      hip.write(90);
-      
+      hip.write(h);
 
       if (Serial.available()>0)
           {
