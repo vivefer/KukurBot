@@ -4,7 +4,7 @@ Servo upjoin;
 Servo lowjoin;
 enum State 
 {
-  STOPPED, STARTED, WALKING, TROTING, DANCING, GALLOPING, RUNNING 
+  STOPPED, STARTED, WALKING, SWALKING, DANCING, RSWALKING, RWALKING 
 };
 State currentState = STOPPED;
 void setup() 
@@ -46,24 +46,24 @@ void loop() {
     
     }
 
-    else if(command.equals("run"))
+    else if(command.equals("rwalk"))
     {
-      currentState = RUNNING;
-      Serial.print("Command:Run , Activated!\n");
+      currentState = RWALKING;
+      Serial.print("Command:Reverse walk , Activated!\n");
     
     }
 
-    else if(command.equals("trot"))
+    else if(command.equals("swalk"))
     {
-      currentState = TROTING;
-      Serial.print("Command: Trot, Activated!\n");
+      currentState = SWALKING;
+      Serial.print("Command: Side Walk, Activated!\n");
     
     }
 
-    else if(command.equals("gallop"))
+    else if(command.equals("rswalk"))
     {
-      currentState = GALLOPING;
-      Serial.print("Command: Gallop, Activated!\n");
+      currentState = RSWALKING;
+      Serial.print("Command: Reverse Side Walking, Activated!\n");
     }
 
     else if(command.equals("dance"))
@@ -134,20 +134,21 @@ void loop() {
 
   while(currentState == WALKING)
     {
-      delay(l);
-      hip.write(h+15); // hip in walking position
       delay(sl);
+      hip.write(h+15); // hip in walking position
+      delay(l);
 
       //lowjoin.write(k);
       //delay(sl);
-      upjoin.write(uj+20); // leg moving forward
-      delay(sl);
-      lowjoin.write(k-15); // knee touchihg ground
-      delay(sl+l);
-      upjoin.write(uj-20); // leg pushing back
-      delay(sl);
+      upjoin.write(uj+25); // leg moving forward
+      delay(l);
+      lowjoin.write(k-25); // knee touchihg ground
+      delay(l);
+      upjoin.write(uj-22);
+      lowjoin.write(k-30); // leg pushing back
+      delay(l);
       lowjoin.write(k+15); // knee lifting from ground
-      delay(sl);
+      delay(l);
       //upjoin.write(uj);
       //delay(sl);
       hip.write(h); // hip to resting position
@@ -176,23 +177,26 @@ void loop() {
     }
   //Next is to code reverse walking, side walking and reverse side walking after making the forward walking stable
   //No work shall be done below this code until the walking is completely coded.
-  while(currentState == RUNNING)
+  while(currentState == RWALKING)
     {
+      delay(sl);
+      hip.write(h+5); // hip in walking position
       delay(l);
-      hip.write(h+15); // 90+15 i.e. 15 degree to side
-      delay(s);
-      lowjoin.write(k+35);
-      delay(s);
-      upjoin.write(uj+30);
-      delay(s);
-      lowjoin.write(k+5);
+      lowjoin.write(k+15); // knee lifting from ground
       delay(l);
-      lowjoin.write(k);
-      delay(s);
-      upjoin.write(uj);
-      delay(s);
-      hip.write(h);
-
+      upjoin.write(uj-22); // leg pushing back
+      delay(l);
+      lowjoin.write(k-15); // knee touchihg ground
+      delay(l);
+      upjoin.write(uj+20); // leg moving forward
+      delay(l);
+      
+      
+      //upjoin.write(uj);
+      delay(sl);
+      hip.write(h); // hip to resting position
+      //Repeat the process
+      //to stop the walking
       if (Serial.available()>0)
           {
             String command = Serial.readStringUntil('\n');
@@ -212,12 +216,88 @@ void loop() {
               currentState = STOPPED;
               Serial.println("\nUnknown command. Type 'start' or 'stop'.\n");
             }
-          }
+          }    
     }
 
   
 
 
   }
+while(currentState == SWALKING)
+    {
+      delay(sl);
+      //hip.write(h-30);
+      delay(l);
+      lowjoin.write(k-15);
+      delay(l);
+      hip.write(h-25);
+      delay(l);
+      lowjoin.write(k+20);
+      delay(sl);
+      hip.write(h); // hip to resting position
+      //Repeat the process
+      //to stop the walking
+      if (Serial.available()>0)
+          {
+            String command = Serial.readStringUntil('\n');
+          
+            if(command.equals("stop"))
+              {
+                currentState = STOPPED;
+                hip.write(0);
+                upjoin.write(0);
+                lowjoin.write(0);
+                Serial.print("\nThe servos are stopped to zero\n");
+                delay(s);
+              
+              }
+            else 
+            {
+              currentState = STOPPED;
+              Serial.println("\nUnknown command. Type 'start' or 'stop'.\n");
+            }
+          }    
+    }
+//reverse side walking is not working yet!
+while(currentState == RSWALKING)
+    {
+      delay(sl);
+      //hip.write(h-30);
+      delay(l);
+      lowjoin.write(k+20);
+      delay(l);
+      hip.write(h-20);
+      delay(l);
+      lowjoin.write(k-15);
+      
+      
+      delay(sl);
+      hip.write(h); // hip to resting position
+      //Repeat the process
+      //to stop the walking
+      if (Serial.available()>0)
+          {
+            String command = Serial.readStringUntil('\n');
+          
+            if(command.equals("stop"))
+              {
+                currentState = STOPPED;
+                hip.write(0);
+                upjoin.write(0);
+                lowjoin.write(0);
+                Serial.print("\nThe servos are stopped to zero\n");
+                delay(s);
+              
+              }
+            else 
+            {
+              currentState = STOPPED;
+              Serial.println("\nUnknown command. Type 'start' or 'stop'.\n");
+            }
+          }    
+    }
+
+  
+
 
 }
